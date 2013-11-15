@@ -37,7 +37,7 @@ from libcloud.compute.types import NodeState
 from libcloud.compute.base import Node, NodeDriver, NodeLocation, NodeSize
 from libcloud.compute.base import NodeImage, StorageVolume
 
-API_VERSION = '2010-08-31'
+API_VERSION = '2013-10-01' # LIBCLOUD-437_ec2_vpc_support
 NAMESPACE = 'http://ec2.amazonaws.com/doc/%s/' % (API_VERSION)
 
 """
@@ -264,7 +264,8 @@ REGION_DETAILS = {
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
-            'c1.xlarge'
+            'c1.xlarge',
+            'hs1.8xlarge'
         ]
     },
     'ap-northeast-1': {
@@ -299,6 +300,8 @@ REGION_DETAILS = {
             'm2.xlarge',
             'm2.2xlarge',
             'm2.4xlarge',
+            'm3.xlarge',
+            'm3.2xlarge',
             'c1.medium',
             'c1.xlarge'
 
@@ -320,7 +323,8 @@ REGION_DETAILS = {
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
-            'c1.xlarge'
+            'c1.xlarge',
+            'hs1.8xlarge'
         ]
     },
     'nimbus': {
@@ -1107,7 +1111,63 @@ class BaseEC2NodeDriver(NodeDriver):
             'Filter.0.Value.0': node.id
         })
 
-    def ex_describe_all_addresses(self, only_allocated=False):
+    # LIBCLOUD-437_ec2_vpc_support
+    def ex_describe_allocation_id(self, elastic_ip_address):
+        params = {
+            'Action': 'DescribeAddresses',
+            #'Filter.0.Name': 'domain',
+            #'Filter.0.Value.0': 'vpc',
+            'Filter.1.Name': 'public-ip',
+            'Filter.1.Value.1': elastic_ip_address
+        }
+        result = self.connection.request(self.path,
+                                         params=params.copy()).object
+        elements = findall(element=result, xpath='addressesSet/item',
+                           namespace=NAMESPACE)
+        allocation_id = findtext(element=elements[0], xpath='allocationId',
+                                 namespace=NAMESPACE)
+        return allocation_id
+
+
+    # LIBCLOUD-437_ec2_vpc_support
+    def ex_allocate_address(self, is_vpc=False):
+        """
+        Allocate a new Elastic IP address
+
+        :return: String representation of allocated IP address
+        :rtype: ``str``
+        """
+        params = {'Action': 'AllocateAddress'}
+
+        # LIBCLOUD-437_ec2_vpc_support
+        if is_vpc:
+            params['Domain'] = 'vpc'
+
+        response = self.connection.request(self.path, params=params).object
+        public_ip = findtext(element=response, xpath='publicIp',
+                             namespace=NAMESPACE)
+
+        return public_ip
+
+    def ex_release_address(self, elastic_ip_address):
+        """
+        Release an Elastic IP address
+
+        :param      elastic_ip_address: Elastic IP address which should be used
+        :type       elastic_ip_address: ``str``
+
+        :return: True on success, False otherwise.
+        :rtype: ``bool``
+        """
+        params = {'Action': 'ReleaseAddress'}
+
+        params.update({'PublicIp': elastic_ip_address})
+        response = self.connection.request(self.path, params=params).object
+        return self._get_boolean(response)
+
+
+    # LIBCLOUD-437_ec2_vpc_support
+    def ex_describe_all_addresses(self, only_allocated=False, is_vpc=False):
         """
         Return all the Elastic IP addresses for this account
         optionally, return only the allocated addresses
@@ -1120,6 +1180,11 @@ class BaseEC2NodeDriver(NodeDriver):
         @rtype: C{list} of C{str}
         """
         params = {'Action': 'DescribeAddresses'}
+
+        # LIBCLOUD-437_ec2_vpc_support
+        if is_vpc:
+            params['Filter.0.Name'] = 'domain'
+            params['Filter.0.Value.0'] = 'vpc'
 
         result = self.connection.request(self.path,
                                          params=params.copy()).object
@@ -1137,12 +1202,13 @@ class BaseEC2NodeDriver(NodeDriver):
 
             ip_address = findtext(element=element, xpath='publicIp',
                                   namespace=NAMESPACE)
-
             elastic_ip_addresses.append(ip_address)
 
         return elastic_ip_addresses
 
-    def ex_associate_addresses(self, node, elastic_ip_address):
+    # LIBCLOUD-437_ec2_vpc_support
+    def ex_associate_addresses(self, node, elastic_ip_address,
+                               allow_reassociation=False):
         """
         Associate an IP address with a particular node.
 
@@ -1156,8 +1222,16 @@ class BaseEC2NodeDriver(NodeDriver):
         """
         params = {'Action': 'AssociateAddress'}
 
+        # LIBCLOUD-437_ec2_vpc_support
+        if 'eipalloc-' in elastic_ip_address:
+            params.update({'AllocationId': elastic_ip_address})
+        else:
+            params.update({'PublicIp': elastic_ip_address})
+
+        if allow_reassociation:
+            params.update({'AllowReassociation': 'true'})
+
         params.update(self._pathlist('InstanceId', [node.id]))
-        params.update({'PublicIp': elastic_ip_address})
         res = self.connection.request(self.path, params=params).object
         return self._get_boolean(res)
 
@@ -1277,8 +1351,9 @@ class BaseEC2NodeDriver(NodeDriver):
         @keyword    ex_maxcount: Maximum number of instances to launch
         @type       ex_maxcount: C{int}
 
-        @keyword    ex_securitygroup: Name of security group
-        @type       ex_securitygroup: C{str}
+        :keyword    ex_security_groups: A list of names of security groups to
+                                        assign to the node.
+        :type       ex_security_groups:   ``list``
 
         @keyword    ex_keyname: The name of the key pair
         @type       ex_keyname: C{str}
@@ -1299,17 +1374,44 @@ class BaseEC2NodeDriver(NodeDriver):
         params = {
             'Action': 'RunInstances',
             'ImageId': image.id,
-            'MinCount': kwargs.get('ex_mincount', '1'),
-            'MaxCount': kwargs.get('ex_maxcount', '1'),
+            'MinCount': str(kwargs.get('ex_mincount', '1')),
+            'MaxCount': str(kwargs.get('ex_maxcount', '1')),
             'InstanceType': size.id
         }
 
-        if 'ex_securitygroup' in kwargs:
-            if not isinstance(kwargs['ex_securitygroup'], list):
-                kwargs['ex_securitygroup'] = [kwargs['ex_securitygroup']]
-            for sig in range(len(kwargs['ex_securitygroup'])):
+        if 'ex_security_groups' in kwargs and 'ex_securitygroup' in kwargs:
+            raise ValueError('You can only supply ex_security_groups or'
+                             ' ex_securitygroup')
+
+        # ex_securitygroup is here for backward compatibility
+        ex_security_groups = kwargs.get('ex_security_groups', None)
+        ex_securitygroup = kwargs.get('ex_securitygroup', None)
+        security_groups = ex_security_groups or ex_securitygroup
+
+        # LIBCLOUD-437_ec2_vpc_support
+        if security_groups and 'ex_securitygroup_ids' in kwargs:
+            raise ValueError('You can only supply ex_security_group[s] or'
+                             ' ex_security_group_ids')
+
+        if security_groups:
+            if not isinstance(security_groups, (tuple, list)):
+                security_groups = [security_groups]
+
+            for sig in range(len(security_groups)):
                 params['SecurityGroup.%d' % (sig + 1,)] =\
-                    kwargs['ex_securitygroup'][sig]
+                    security_groups[sig]
+
+        # LIBCLOUD-437_ec2_vpc_support
+        elif 'ex_security_group_ids' in kwargs:
+            if not isinstance(kwargs['ex_security_group_ids'], list):
+                kwargs['ex_security_group_ids'] = [kwargs['ex_security_group_ids']]
+            for sig in range(len(kwargs['ex_security_group_ids'])):
+                params['SecurityGroupId.%d' % (sig + 1,)] =\
+                    kwargs['ex_security_group_ids'][sig]
+
+        # LIBCLOUD-437_ec2_vpc_support
+        if 'ex_subnet_id' in kwargs:
+            params['SubnetId'] = kwargs['ex_subnet_id']
 
         if 'location' in kwargs:
             availability_zone = getattr(kwargs['location'],
