@@ -681,13 +681,19 @@ class BaseEC2NodeDriver(NodeDriver):
                     )
         return locations
 
-    def create_volume(self, size, name, location=None, snapshot=None):
+    # XXX io1 volume type
+    def create_volume(self, size, name, location=None, snapshot=None, iops=None):
         params = {
             'Action': 'CreateVolume',
             'Size': str(size)}
 
         if location is not None:
             params['AvailabilityZone'] = location.availability_zone.name
+
+        # XXX io1 volume type
+        if iops is not None:
+            params['VolumeType'] = 'io1'
+            params['Iops'] = iops
 
         volume = self._to_volume(
             self.connection.request(self.path, params=params).object,
@@ -1412,6 +1418,10 @@ class BaseEC2NodeDriver(NodeDriver):
         # LIBCLOUD-437_ec2_vpc_support
         if 'ex_subnet_id' in kwargs:
             params['SubnetId'] = kwargs['ex_subnet_id']
+
+        # XXX io1 volume type
+        if 'ebs_optimized' in kwargs and kwargs['ebs_optimized']:
+            params['EbsOptimized'] = 'true'
 
         if 'location' in kwargs:
             availability_zone = getattr(kwargs['location'],
