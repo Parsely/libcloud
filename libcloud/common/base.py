@@ -613,6 +613,8 @@ class Connection(object):
         else:
             url = action
 
+        ###print(url)
+
         # Removed terrible hack...this a less-bad hack that doesn't execute a
         # request twice, but it's still a hack.
         self.connect()
