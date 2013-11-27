@@ -693,7 +693,7 @@ class BaseEC2NodeDriver(NodeDriver):
         # XXX io1 volume type
         if iops is not None:
             params['VolumeType'] = 'io1'
-            params['Iops'] = iops
+            params['Iops'] = str(iops)
 
         volume = self._to_volume(
             self.connection.request(self.path, params=params).object,
