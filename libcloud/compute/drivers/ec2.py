@@ -115,6 +115,20 @@ INSTANCE_TYPES = {
         'disk': 1690,
         'bandwidth': None
     },
+    'm3.medium': {
+        'id': 'm3.medium',
+        'name': 'Medium Instance',
+        'ram': 3840,
+        'disk': 4000,
+        'bandwidth': None
+    },
+    'm3.large': {
+        'id': 'm3.large',
+        'name': 'Large Instance',
+        'ram': 7168,
+        'disk': 32000,
+        'bandwidth': None
+    },
     'm3.xlarge': {
         'id': 'm3.xlarge',
         'name': 'Extra Large Instance',
@@ -163,7 +177,36 @@ INSTANCE_TYPES = {
         'ram': 119808,
         'disk': 48000,
         'bandwidth': None
-    }
+    },
+    # i2 instances have up to eight SSD drives
+    'i2.xlarge': {
+        'id': 'i2.xlarge',
+        'name': 'High Storage Optimized Extra Large Instance',
+        'ram': 31232,
+        'disk': 800,
+        'bandwidth': None
+    },
+    'i2.2xlarge': {
+        'id': 'i2.2xlarge',
+        'name': 'High Storage Optimized Double Extra Large Instance',
+        'ram': 62464,
+        'disk': 1600,
+        'bandwidth': None
+    },
+    'i2.4xlarge': {
+        'id': 'i2.4xlarge',
+        'name': 'High Storage Optimized Quadruple Large Instance',
+        'ram': 124928,
+        'disk': 3200,
+        'bandwidth': None
+    },
+    'i2.8xlarge': {
+        'id': 'i2.8xlarge',
+        'name': 'High Storage Optimized Eight Extra Large Instance',
+        'ram': 249856,
+        'disk': 6400,
+        'bandwidth': None
+    },
 }
 
 REGION_DETAILS = {
@@ -180,6 +223,8 @@ REGION_DETAILS = {
             'm2.xlarge',
             'm2.2xlarge',
             'm2.4xlarge',
+            'm3.medium',
+            'm3.large',
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
@@ -188,7 +233,11 @@ REGION_DETAILS = {
             'cc2.8xlarge',
             'cg1.4xlarge',
             'cr1.8xlarge',
-            'hs1.8xlarge'
+            'hs1.8xlarge',
+            'i2.xlarge',
+            'i2.2xlarge',
+            'i2.4xlarge',
+            'i2.8xlarge',
         ]
     },
     'us-west-1': {
@@ -204,6 +253,8 @@ REGION_DETAILS = {
             'm2.xlarge',
             'm2.2xlarge',
             'm2.4xlarge',
+            'm3.medium',
+            'm3.large',
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
@@ -241,6 +292,8 @@ REGION_DETAILS = {
             'm2.xlarge',
             'm2.2xlarge',
             'm2.4xlarge',
+            'm3.medium',
+            'm3.large',
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
@@ -261,6 +314,8 @@ REGION_DETAILS = {
             'm2.xlarge',
             'm2.2xlarge',
             'm2.4xlarge',
+            'm3.medium',
+            'm3.large',
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
@@ -281,6 +336,8 @@ REGION_DETAILS = {
             'm2.xlarge',
             'm2.2xlarge',
             'm2.4xlarge',
+            'm3.medium',
+            'm3.large',
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
@@ -300,6 +357,8 @@ REGION_DETAILS = {
             'm2.xlarge',
             'm2.2xlarge',
             'm2.4xlarge',
+            'm3.medium',
+            'm3.large',
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
@@ -320,6 +379,8 @@ REGION_DETAILS = {
             'm2.xlarge',
             'm2.2xlarge',
             'm2.4xlarge',
+            'm3.medium',
+            'm3.large',
             'm3.xlarge',
             'm3.2xlarge',
             'c1.medium',
@@ -594,10 +655,60 @@ class BaseEC2NodeDriver(NodeDriver):
         )
         return n
 
-    def _to_volume(self, element, name):
+
+    def _get_resource_tags(self, element):
+        """
+        Parse tags from the provided element and return a dictionary with
+        key/value pairs.
+
+        :rtype: ``dict``
+        """
+        tags = {}
+
+        # Get our tag set by parsing the element
+        tag_set = findall(element=element,
+                          xpath='tagSet/item',
+                          namespace=NAMESPACE)
+
+        for tag in tag_set:
+            key = findtext(element=tag,
+                           xpath='key',
+                           namespace=NAMESPACE)
+
+            value = findtext(element=tag,
+                             xpath='value',
+                             namespace=NAMESPACE)
+
+            tags[key] = value
+
+        return tags
+
+    def _to_volume(self, element, name=None):
+        """
+        Parse the XML element and return a StorageVolume object.
+
+        :param      name: An optional name for the volume. If not provided
+                          then either tag with a key "Name" or volume ID
+                          will be used (which ever is available first in that
+                          order).
+        :type       name: ``str``
+
+        :rtype:     :class:`StorageVolume`
+        """
         volId = findtext(element=element, xpath='volumeId',
                          namespace=NAMESPACE)
         size = findtext(element=element, xpath='size', namespace=NAMESPACE)
+
+        # Get our tags
+        tags = self._get_resource_tags(element)
+
+        # If name was not passed into the method then
+        # fall back then use the volume id
+        name = name if name else tags.get('Name', volId)
+
+        ## Get our extra dictionary
+        #extra = self._get_extra_dict(
+        #    element, RESOURCE_EXTRA_ATTRIBUTES_MAP['volume'])
 
         return StorageVolume(id=volId,
                              name=name,
@@ -680,6 +791,23 @@ class BaseEC2NodeDriver(NodeDriver):
                         availability_zone)
                     )
         return locations
+
+
+    # XXX from https://github.com/apache/libcloud/commit/f15bc5ed2ecef63db51dbebdbc8654e09e296483
+    def list_volumes(self, node=None):
+        params = {
+            'Action': 'DescribeVolumes',
+        }
+        if node:
+            params.update({
+                'Filter.1.Name': 'attachment.instance-id',
+                'Filter.1.Value': node.id,
+            })
+        response = self.connection.request(self.path, params=params).object
+        volumes = [self._to_volume(el) for el in response.findall(
+            fixxpath(xpath='volumeSet/item', namespace=NAMESPACE))
+        ]
+        return volumes
 
     # XXX io1 volume type
     def create_volume(self, size, name, location=None, snapshot=None, iops=None):
@@ -1374,6 +1502,11 @@ class BaseEC2NodeDriver(NodeDriver):
                     mappings. Example:
                     [{'DeviceName': '/dev/sdb', 'VirtualName': 'ephemeral0'}]
         @type       ex_blockdevicemappings: C{list} of C{dict}
+
+        # XXX placement groups
+        @keyword    ex_placementgroup: Placment group name
+        @type       ex_placementgroup: C{str}
+
         """
         image = kwargs["image"]
         size = kwargs["size"]
@@ -1431,6 +1564,10 @@ class BaseEC2NodeDriver(NodeDriver):
                     raise AttributeError('Invalid availability zone: %s'
                                          % (availability_zone.name))
                 params['Placement.AvailabilityZone'] = availability_zone.name
+
+        # XXX placement groups
+        if 'ex_placementgroup' in kwargs and kwargs['ex_placementgroup']:
+            params['Placement.GroupName'] = kwargs['ex_placementgroup']
 
         if 'ex_keyname' in kwargs:
             params['KeyName'] = kwargs['ex_keyname']

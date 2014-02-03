@@ -25,7 +25,16 @@
             "5": 0.240,
             "6": 0.480,
             "7": 0.960,
-            "8": 1.200
+            "8": 1.200,
+            "performance1-1": 0.040,
+            "performance1-2": 0.080,
+            "performance1-4": 0.160,
+            "performance1-8": 0.320,
+            "performance2-15": 0.680,
+            "performance2-30": 1.360,
+            "performance2-60": 2.720,
+            "performance2-90": 4.080,
+            "performance2-120": 5.440
         },
 
         "rackspacenovalon": {
@@ -36,6 +45,16 @@
             "6": 0.516,
             "7": 0.967,
             "8": 1.612
+        },
+
+        "rackspacenovasyd": {
+            "2": 0.026,
+            "3": 0.072,
+            "4": 0.144,
+            "5": 0.288,
+            "6": 0.576,
+            "7": 1.080,
+            "8": 1.440
         },
 
         "dreamhost": {
@@ -54,16 +73,27 @@
             "m1.xlarge": 0.52,
             "c1.medium": 0.17,
             "c1.xlarge": 0.68,
+            "c3.large": 0.150,
+            "c3.xlarge": 0.300,
+            "c3.2xlarge": 0.600,
+            "c3.4xlarge": 1.200,
+            "c3.8xlarge": 2.400,
             "m2.xlarge": 0.50,
             "m2.2xlarge": 1.0,
             "m2.4xlarge": 2.0,
-            "m3.xlarge": 0.50,
-            "m3.2xlarge": 1.00,
+            "m3.medium": 0.113,
+            "m3.large": 0.225,
+            "m3.xlarge": 0.45,
+            "m3.2xlarge": 0.90,
             "cg1.4xlarge": 2.1,
             "cc1.4xlarge": 1.3,
             "cc2.8xlarge": 2.4,
             "cr1.8xlarge": 3.50,
-            "hs1.8xlarge": 4.6
+            "hs1.8xlarge": 4.6,
+            "i2.xlarge": 0.85,
+            "i2.2xlarge": 1.71,
+            "i2.4xlarge": 3.41,
+            "i2.8xlarge": 6.82
         },
 
         "ec2_us_west": {
@@ -74,11 +104,22 @@
             "m1.xlarge": 0.76,
             "c1.medium": 0.19,
             "c1.xlarge": 0.76,
+            "c3.large": 0.171,
+            "c3.xlarge": 0.342,
+            "c3.2xlarge": 0.633,
+            "c3.4xlarge": 1.366,
+            "c3.8xlarge": 2.732,
             "m2.xlarge": 0.57,
             "m2.2xlarge": 1.14,
             "m2.4xlarge": 2.28,
-            "m3.xlarge": 0.55,
-            "m3.2xlarge": 1.10
+            "m3.medium": 0.124,
+            "m3.large": 0.248,
+            "m3.xlarge": 0.495,
+            "m3.2xlarge": 0.990,
+            "i2.xlarge": 0.85,
+            "i2.2xlarge": 1.71,
+            "i2.4xlarge": 3.41,
+            "i2.8xlarge": 6.82
         },
 
         "ec2_us_west_oregon": {
@@ -89,12 +130,23 @@
             "m1.xlarge": 0.52,
             "c1.medium": 0.17,
             "c1.xlarge": 0.68,
+            "c3.large": 0.150,
+            "c3.xlarge": 0.300,
+            "c3.2xlarge": 0.600,
+            "c3.4xlarge": 1.200,
+            "c3.8xlarge": 2.400,
             "m2.xlarge": 0.50,
             "m2.2xlarge": 1.0,
             "m2.4xlarge": 2.0,
-            "m3.xlarge": 0.50,
-            "m3.2xlarge": 1.00,
-            "cc2.8xlarge": 2.400
+            "m3.medium": 0.113,
+            "m3.large": 0.225,
+            "m3.xlarge": 0.45,
+            "m3.2xlarge": 0.90,
+            "cc2.8xlarge": 2.400,
+            "i2.xlarge": 0.85,
+            "i2.2xlarge": 1.71,
+            "i2.4xlarge": 3.41,
+            "i2.8xlarge": 6.82
         },
 
        "ec2_eu_west": {
@@ -105,12 +157,23 @@
             "m1.xlarge": 0.76,
             "c1.medium": 0.19,
             "c1.xlarge": 0.76,
+            "c3.large": 0.171,
+            "c3.xlarge": 0.342,
+            "c3.2xlarge": 0.683,
+            "c3.4xlarge": 1.366,
+            "c3.8xlarge": 2.732,
             "m2.xlarge": 0.57,
             "m2.2xlarge": 1.14,
             "m2.4xlarge": 2.28,
-            "m3.xlarge": 0.55,
-            "m3.2xlarge": 1.10,
-            "cc2.8xlarge": 2.7
+            "m3.medium": 0.124,
+            "m3.large": 0.248,
+            "m3.xlarge": 0.495,
+            "m3.2xlarge": 0.990,
+            "cc2.8xlarge": 2.7,
+            "i2.xlarge": 0.85,
+            "i2.2xlarge": 1.71,
+            "i2.4xlarge": 3.41,
+            "i2.8xlarge": 6.82
         },
 
        "ec2_ap_southeast": {
@@ -121,11 +184,23 @@
             "m1.xlarge": 0.76,
             "c1.medium": 0.19,
             "c1.xlarge": 0.76,
+            "c3.large": 0.189,
+            "c3.xlarge": 0.378,
+            "c3.2xlarge": 0.756,
+            "c3.4xlarge": 1.512,
+            "c3.8xlarge": 3.024,
             "m2.xlarge": 0.57,
             "m2.2xlarge": 1.14,
             "m2.4xlarge": 2.28,
-            "m3.xlarge": 0.70,
-            "m3.2xlarge": 1.40
+            "m3.medium": 0.158,
+            "m3.large": 0.315,
+            "m3.xlarge": 0.630,
+            "m3.2xlarge": 1.260,
+            "hs1.8xlarge": 5.570,
+            "i2.xlarge": 0.85,
+            "i2.2xlarge": 1.71,
+            "i2.4xlarge": 3.41,
+            "i2.8xlarge": 6.82
         },
 
        "ec2_ap_northeast": {
@@ -136,11 +211,22 @@
             "m1.xlarge": 0.80,
             "c1.medium": 0.20,
             "c1.xlarge": 0.80,
+            "c3.large": 0.192,
+            "c3.xlarge": 0.383,
+            "c3.2xlarge": 0.766,
+            "c3.4xlarge": 1.532,
+            "c3.8xlarge": 3.064,
             "m2.xlarge": 0.60,
             "m2.2xlarge": 1.20,
             "m2.4xlarge": 2.39,
-            "m3.xlarge": 0.76,
-            "m3.2xlarge": 1.52
+            "m3.medium": 0.171,
+            "m3.large": 0.342,
+            "m3.xlarge": 0.684,
+            "m3.2xlarge": 1.368,
+            "i2.xlarge": 0.85,
+            "i2.2xlarge": 1.71,
+            "i2.4xlarge": 3.41,
+            "i2.8xlarge": 6.82
        },
 
         "ec2_sa_east": {
@@ -153,7 +239,11 @@
             "c1.xlarge": 0.92,
             "m2.xlarge": 0.68,
             "m2.2xlarge": 1.36,
-            "m2.4xlarge": 2.72
+            "m2.4xlarge": 2.72,
+            "m3.medium": 0.153,
+            "m3.large": 0.306,
+            "m3.xlarge": 0.612,
+            "m3.2xlarge": 1.224
         },
 
        "ec2_ap_southeast_2": {
@@ -164,11 +254,39 @@
             "m1.xlarge": 0.680,
             "c1.medium": 0.186,
             "c1.xlarge": 0.744,
+            "c3.large": 0.189,
+            "c3.xlarge": 0.378,
+            "c3.2xlarge": 0.756,
+            "c3.4xlarge": 1.512,
+            "c3.8xlarge": 3.024,
             "m2.xlarge": 0.506,
             "m2.2xlarge": 1.012,
             "m2.4xlarge": 2.024,
-            "m3.xlarge": 0.70,
-            "m3.2xlarge": 1.40
+            "m3.medium": 0.158,
+            "m3.large": 0.315,
+            "m3.xlarge": 0.630,
+            "m3.2xlarge": 1.260,
+            "hs1.8xlarge": 5.570,
+            "i2.xlarge": 0.85,
+            "i2.2xlarge": 1.71,
+            "i2.4xlarge": 3.41,
+            "i2.8xlarge": 6.82
+        },
+
+        "nephoscale" : {
+            "1": 0.60,
+            "3": 0.063,
+            "5": 0.031,
+            "7": 0.125,
+            "9": 0.188,
+            "11": 0.35,
+            "27": 0.0,
+            "46": 0.10,
+            "48": 0.15,
+            "50": 0.28,
+            "52": 0.48,
+            "54": 0.938,
+            "56": 0.75
         },
 
         "nimbus" : {
