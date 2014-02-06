@@ -101,6 +101,13 @@ INSTANCE_TYPES = {
         'disk': 80,
         'bandwidth': None
     },
+    'c3.2xlarge': {
+        'id': 'c3.2xlarge',
+        'name': 'High-CPU Double Extra Large Instance',
+        'ram': 15360,
+        'disk': 160,
+        'bandwidth': None
+    },
     'm2.xlarge': {
         'id': 'm2.xlarge',
         'name': 'High-Memory Extra Large Instance',
@@ -237,6 +244,7 @@ REGION_DETAILS = {
             'c1.medium',
             'c1.xlarge',
             'c3.xlarge',
+            'c3.2xlarge',
             'cc1.4xlarge',
             'cc2.8xlarge',
             'cg1.4xlarge',
