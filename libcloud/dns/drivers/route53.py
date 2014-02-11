@@ -311,9 +311,15 @@ class Route53DNSDriver(DNSDriver):
         # TODO: Support records with multiple values
         value_elem = elem.findall(
             fixxpath(xpath='ResourceRecords/ResourceRecord',
-                     namespace=NAMESPACE))[0]
-        data = findtext(element=(value_elem), xpath='Value',
-                        namespace=NAMESPACE)
+                     namespace=NAMESPACE))
+
+        if len(value_elem):
+            value_elem = value_elem[0]
+            data = findtext(element=(value_elem), xpath='Value',
+                            namespace=NAMESPACE)
+        else:
+            value_elem = 'unknown alias'
+            data = {}
 
         extra = {'ttl': ttl}
 
