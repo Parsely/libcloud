@@ -278,7 +278,6 @@ INSTANCE_TYPES = {
         'disk': 2048,
         'bandwidth': None
     },
-    },
     # i2 instances have up to eight SSD drives
     'i2.xlarge': {
         'id': 'i2.xlarge',
@@ -343,6 +342,7 @@ INSTANCE_TYPES = {
         'ram': 244000,
         'disk': 320,  # x2
         'bandwidth': None
+    }
 }
 
 REGION_DETAILS = {
