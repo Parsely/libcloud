@@ -154,14 +154,14 @@ INSTANCE_TYPES = {
         'id': 'm3.xlarge',
         'name': 'Extra Large Instance',
         'ram': 15360,
-        'disk': None,
+        'disk': 80000,
         'bandwidth': None
     },
     'm3.2xlarge': {
         'id': 'm3.2xlarge',
         'name': 'Double Extra Large Instance',
         'ram': 30720,
-        'disk': None,
+        'disk': 160000,
         'bandwidth': None
     },
     'cg1.4xlarge': {
@@ -170,6 +170,13 @@ INSTANCE_TYPES = {
         'ram': 22528,
         'disk': 1690,
         'bandwidth': None
+    },
+    'g2.2xlarge': {
+        'id': 'g2.2xlarge',
+        'name': 'Cluster GPU G2 Double Extra Large Instance',
+        'ram': 15000,
+        'disk': 60,
+        'bandwidth': None,
     },
     'cc1.4xlarge': {
         'id': 'cc1.4xlarge',
@@ -264,6 +271,78 @@ INSTANCE_TYPES = {
         'disk': 320, # x2
         'bandwidth': None
     },
+    'hs1.4xlarge': {
+        'id': 'hs1.4xlarge',
+        'name': 'High Storage Quadruple Extra Large Instance',
+        'ram': 61952,
+        'disk': 2048,
+        'bandwidth': None
+    },
+    },
+    # i2 instances have up to eight SSD drives
+    'i2.xlarge': {
+        'id': 'i2.xlarge',
+        'name': 'High Storage Optimized Extra Large Instance',
+        'ram': 31232,
+        'disk': 800,
+        'bandwidth': None
+    },
+    'i2.2xlarge': {
+        'id': 'i2.2xlarge',
+        'name': 'High Storage Optimized Double Extra Large Instance',
+        'ram': 62464,
+        'disk': 1600,
+        'bandwidth': None
+    },
+    'i2.4xlarge': {
+        'id': 'i2.4xlarge',
+        'name': 'High Storage Optimized Quadruple Large Instance',
+        'ram': 124928,
+        'disk': 3200,
+        'bandwidth': None
+    },
+    'i2.8xlarge': {
+        'id': 'i2.8xlarge',
+        'name': 'High Storage Optimized Eight Extra Large Instance',
+        'ram': 249856,
+        'disk': 6400,
+        'bandwidth': None
+    },
+    # 1x SSD
+    'r3.large': {
+        'id': 'r3.large',
+        'name': 'Memory Optimized Large instance',
+        'ram': 15000,
+        'disk': 32,
+        'bandwidth': None
+    },
+    'r3.xlarge': {
+        'id': 'r3.xlarge',
+        'name': 'Memory Optimized Extra Large instance',
+        'ram': 30500,
+        'disk': 80,
+        'bandwidth': None
+    },
+    'r3.2xlarge': {
+        'id': 'r3.2xlarge',
+        'name': 'Memory Optimized Double Extra Large instance',
+        'ram': 61000,
+        'disk': 160,
+        'bandwidth': None
+    },
+    'r3.4xlarge': {
+        'id': 'r3.4xlarge',
+        'name': 'Memory Optimized Quadruple Extra Large instance',
+        'ram': 122000,
+        'disk': 320,
+        'bandwidth': None
+    },
+    'r3.8xlarge': {
+        'id': 'r3.8xlarge',
+        'name': 'Memory Optimized Eight Extra Large instance',
+        'ram': 244000,
+        'disk': 320,  # x2
+        'bandwidth': None
 }
 
 REGION_DETAILS = {
@@ -292,6 +371,7 @@ REGION_DETAILS = {
             'cc1.4xlarge',
             'cc2.8xlarge',
             'cg1.4xlarge',
+            'g2.2xlarge',
             'cr1.8xlarge',
             'hs1.8xlarge',
             'i2.xlarge',
@@ -302,8 +382,8 @@ REGION_DETAILS = {
             'r3.xlarge',
             'r3.2xlarge',
             'r3.4xlarge',
-            'r3.8xlarge',
-        ]
+            'r3.8xlarge'
+            ]
     },
     'us-west-1': {
         'endpoint': 'ec2.us-west-1.amazonaws.com',
@@ -357,8 +437,8 @@ REGION_DETAILS = {
             'r3.xlarge',
             'r3.2xlarge',
             'r3.4xlarge',
-            'r3.8xlarge',
-        ]
+            'r3.8xlarge'
+            ]
     },
     'eu-west-1': {
         'endpoint': 'ec2.eu-west-1.amazonaws.com',
