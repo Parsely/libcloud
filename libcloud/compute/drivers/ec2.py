@@ -425,8 +425,6 @@ REGION_DETAILS = {
             'c3.large',
             'c3.xlarge',
             'c3.2xlarge',
-            'c3.4xlarge',
-            'c3.8xlarge',
             'hs1.8xlarge',
             'cc2.8xlarge',
             'i2.xlarge',
