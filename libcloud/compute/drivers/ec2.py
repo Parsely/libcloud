@@ -115,6 +115,13 @@ INSTANCE_TYPES = {
         'disk': 160,
         'bandwidth': None
     },
+    'c3.4xlarge': {
+        'id': 'c3.4xlarge',
+        'name': 'High-CPU Quadruple Extra Large Instance',
+        'ram': 30720,
+        'disk': 320,
+        'bandwidth': None
+    },
     'm2.xlarge': {
         'id': 'm2.xlarge',
         'name': 'High-Memory Extra Large Instance',
