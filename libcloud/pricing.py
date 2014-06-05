@@ -120,7 +120,7 @@ def get_size_price(driver_type, driver_name, size_id):
     @return: Size price.
     """
     pricing = get_pricing(driver_type=driver_type, driver_name=driver_name)
-    price = float(pricing[size_id])
+    price = float(pricing.get('size_id', 0.0))
     return price
 
 

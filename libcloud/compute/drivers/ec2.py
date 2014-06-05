@@ -368,6 +368,7 @@ REGION_DETAILS = {
             'c3.large',
             'c3.xlarge',
             'c3.2xlarge',
+            'c3.4xlarge',
             'cc1.4xlarge',
             'cc2.8xlarge',
             'cg1.4xlarge',
