@@ -977,23 +977,46 @@ class BaseEC2NodeDriver(NodeDriver):
         return volumes
 
     # XXX io1 volume type
-    def create_volume(self, size, name, location=None, snapshot=None, iops=None):
+    def create_volume(self, size, name, location=None, snapshot=None,
+                      ex_volume_type='standard', ex_iops=None):
+        """
+        :param location: Datacenter in which to create a volume in.
+        :type location: :class:`.ExEC2AvailabilityZone`
+
+        :param ex_volume_type: Type of volume to create.
+        :type ex_volume_type: ``str``
+
+        :param iops: The number of I/O operations per second (IOPS)
+                     that the volume supports. Only used if ex_volume_type
+                     is io1.
+        :type iops: ``int``
+        """
+        valid_volume_types = ['standard', 'io1', 'g2']
+
         params = {
             'Action': 'CreateVolume',
             'Size': str(size)}
 
+        if ex_volume_type and ex_volume_type not in valid_volume_types:
+            raise ValueError('Invalid volume type specified: %s' %
+                             (ex_volume_type))
+
         if location is not None:
             params['AvailabilityZone'] = location.availability_zone.name
 
-        # XXX io1 volume type
-        if iops is not None:
-            params['VolumeType'] = 'io1'
-            params['Iops'] = str(iops)
+        if ex_volume_type:
+            params['VolumeType'] = ex_volume_type
+
+        if ex_volume_type == 'io1' and ex_iops:
+            params['Iops'] = ex_iops
 
         volume = self._to_volume(
             self.connection.request(self.path, params=params).object,
             name=name)
-        self.ex_create_tags(volume, {'Name': name})
+
+        if self.ex_create_tags(volume, {'Name': name}):
+            volume.extra['tags']['Name'] = name
+
         return volume
 
     def destroy_volume(self, volume):
